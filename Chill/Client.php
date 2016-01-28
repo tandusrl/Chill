@@ -169,7 +169,8 @@ class Client
         list($status, $response) = $this->sendRequest($url, $context);
 
         if ($status != 200) {
-            throw new Exception\Response('POST View - Unknown response status.');
+            throw new Exception\Response(
+              "POST [$url] View - Unknown response status $status instead of 200");
         }
 
         return $this->asDocs ? $this->toDocuments($response) : $response;
@@ -236,7 +237,7 @@ class Client
         if ($status == 409) {
             throw new Exception\Conflict('PUT /' . $documentId . ' failed.');
         } elseif ($status != 201) {
-            throw new Exception\Response('PUT /' . $documentId . ' - Unknown response status.');
+            throw new Exception\Response('PUT /' . $documentId . ' - Unknown response status '.$status.' instead of 201');
         }
 
         if (isset($response['id'])) {
@@ -266,7 +267,7 @@ class Client
         list($status, $response) = $this->sendRequest('', $context);
 
         if ($status != 201) {
-            throw new Exception\Response('POST - Unknown response status.');
+            throw new Exception\Response('POST - Unknown response status  '.$status.' instead of 201');
         }
 
         if (isset($response['id'])) {
@@ -294,7 +295,7 @@ class Client
         unset($response);
 
         if ($status != 200) {
-            throw new Exception\Response('DELETE - Unknown response status.');
+            throw new Exception\Response('DELETE - Unknown response status  '.$status.' instead of 200');
         }
 
         if ($this->getCache($documentId)) {
