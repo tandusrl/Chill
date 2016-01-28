@@ -1,5 +1,5 @@
 {
-    "name": "chill/chill",
+    "name": "tandusrl/chill",
     "type": "library",
     "description": "CouchDb client library for PHP 5.3+",
     "keywords": ["couchdb", "couch", "database", "client", "library"],
