@@ -1,6 +1,12 @@
 Chill - PHP Library for CouchDb
 ===============================
 
+This is a fork
+---------------
+
+This is just an internal fork in order to have better error handling and have more flexibility
+
+
 Chill is a simple and efficient CouchDb client library for PHP. Released under the BSD 2 Clause Licence and made available via [Composer/Packagist](https://packagist.org/packages/chill/chill).
 
 **Current Build Status:**
@@ -26,7 +32,7 @@ $docs = $chill->asDocuments()->getView('mydesign', 'myview', array('key1', 'key2
 
 foreach ($docs as $doc) {
     print $doc->_id . PHP_EOL;
-} 
+}
 ```
 
 **Retrieve and update a document**
@@ -39,7 +45,7 @@ $doc->save();
 ```
 
 With thanks to
--------------- 
+--------------
 * [Sylvain Filteau](https://github.com/sylvainfilteau) for contributing various bug fixes.
 * [Luke Plaster](https://github.com/notatestuser) for contributing support for arrays as view parameters.
 * [Ryan Hughes](https://github.com/ryanhughes) for fixing a bug related to PUT requests.
