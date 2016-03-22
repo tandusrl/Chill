@@ -80,14 +80,29 @@ class Client
     /**
      * Constructor - Create a new Chill object.
      *
-     * @param string $host Hostname of the CouchDb server.
-     * @param string $database Database name.
+     * @param string  $host Hostname of the CouchDb server.
+     * @param string  $database Database name.
+     * @param string  $username username
+     * @param string  $password password
      * @param integer $port Port number.
-     * @param string $scheme http or https.
+     * @param string  $scheme http or https.
      */
-    public function __construct($host, $database, $port = 5984, $scheme = 'http')
+    public function __construct($host, $database, $username = '',
+      $password = '', $port = 5984, $scheme = 'http')
     {
+      // if we have a username other than default we are going to create the url
+      // in a different way
+      //
+      if ($username != '') {
+        $username = urlencode($username);
+        $password = urlencode($password);
+
+        $this->url = $scheme . '://'. $username. ':'. $password.
+          '@'. $host . ':' . $port . '/' . $database . '/';
+      }
+      else {
         $this->url = $scheme . '://' . $host . ':' . $port . '/' . $database . '/';
+      }
     }
 
     /**
@@ -124,6 +139,16 @@ class Client
         }
 
         return $rtn;
+    }
+
+    /**
+     * This function makes a raw get
+     * @param  String $doc raw documents type
+     * @return \Chill\Document[]|array
+     */
+    public function getRawDocument($design) {
+      $response = $this->getViewByGet($design);
+      return $this->asDocs ? $this->toDocuments($response) : $response;
     }
 
     /**
