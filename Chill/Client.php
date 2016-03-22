@@ -78,6 +78,31 @@ class Client
     protected $asDocs = false;
 
     /**
+     * @var string username in order to connect to the database
+     */
+    private $username = '';
+
+    /**
+     * @var string password in order to connect to the database
+     */
+    private $password = '';
+
+    /**
+     * @var string This variable chaches the host
+     */
+    private $host;
+
+    /**
+     * @var integer This variable caches the port
+     */
+    private $port;
+
+    /**
+     * @var string This variable caches the scheme
+     */
+    private $scheme;
+
+    /**
      * Constructor - Create a new Chill object.
      *
      * @param string  $host Hostname of the CouchDb server.
@@ -90,12 +115,19 @@ class Client
     public function __construct($host, $database, $username = '',
       $password = '', $port = 5984, $scheme = 'http')
     {
+      $this->host    = $host;
+      $this->port    = $port;
+      $this->scheme  = $scheme;
+
       // if we have a username other than default we are going to create the url
       // in a different way
       //
       if ($username != '') {
         $username = urlencode($username);
+        $this->username = $username;
         $password = urlencode($password);
+        $this->password = $password;
+
 
         $this->url = $scheme . '://'. $username. ':'. $password.
           '@'. $host . ':' . $port . '/' . $database . '/';
@@ -103,6 +135,42 @@ class Client
       else {
         $this->url = $scheme . '://' . $host . ':' . $port . '/' . $database . '/';
       }
+    }
+
+
+    /**
+     * This function creates a new database
+     * @param  string $dbname the database name
+     * @return [type]         [description]
+     */
+    public function createDatabase($dbname){
+
+      $context = array('http' => array());
+      $context['http']['method'] = 'PUT';
+      $context['http']['header'] = 'Content-Type: application/json';
+
+      $old_url = $this->url;
+
+      // if we have a username other than default we are going to create the url
+      // in a different way
+      if ($this->username != '') {
+        $this->url = $this->scheme . '://'. $this->username. ':'. $this->password.
+          '@'. $this->host . ':' . $this->port . '/';
+      }
+      else {
+        $this->url = $this->scheme . '://'. $this->host . ':' . $this->port . '/';
+      }
+
+      list($status, $response) = $this->sendRequest($dbname, $context);
+
+      if ($status != 201) {
+        throw new Exception\Response('Create database - Unknown response status: '.$status.'
+        when trying to PUT '.$this->url  );
+      }
+
+      $this->url = $old_url;
+
+      return $this->asDocs ? $this->toDocuments($response) : $response;
     }
 
     /**
@@ -426,7 +494,7 @@ class Client
         $response = @file_get_contents($this->url . $uri, false, $context);
 
         if ($response === false) {
-            throw new Exception\Connection('Could not connect to CouchDb server.');
+            throw new Exception\Connection('Could not connect to CouchDb server, sent: '.$this->url . $uri);
         }
 
         $statusParts = explode(' ', $http_response_header[0]);
